@@ -1,0 +1,95 @@
+---
+apiVersion: "v1"
+kind: "Service"
+metadata:
+  labels:
+    app: "crm"
+  name: "crm-svc"
+spec:
+  ports:
+  - name: "port-1-crm-svc"
+    port: 9102
+    protocol: "TCP"
+    targetPort: 9102
+  selector:
+    app: "crm"
+  type: "ClusterIP"
+---
+apiVersion: "apps/v1"
+kind: "Deployment"
+metadata:
+  labels:
+    app: "crm"
+  name: "crm-deployment"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "crm"
+  template:
+    metadata:
+      labels:
+        app: "crm"
+        component: "wso2ballerina"
+    spec:
+      containers:
+      - env:
+        - name: "BAL_CONFIG_FILES"
+          value: "/home/ballerina/conf/Config.toml:"
+        image: "tmart/crm:v1"
+        lifecycle:
+          preStop:
+            exec:
+              command:
+              - "sleep"
+              - "15"
+        name: "crm-deployment"
+        ports:
+        - containerPort: 9102
+          name: "port-1-crm-svc"
+          protocol: "TCP"
+        resources:
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+          requests:
+            memory: "100Mi"
+            cpu: "200m"
+        volumeMounts:
+        - mountPath: "/home/ballerina/conf/"
+          name: "crm-configmap-volume"
+          readOnly: false
+      volumes:
+      - configMap:
+          name: "crm-configmap"
+        name: "crm-configmap-volume"
+---
+apiVersion: "autoscaling/v2"
+kind: "HorizontalPodAutoscaler"
+metadata:
+  labels:
+    app: "crm"
+  name: "crm-hpa"
+spec:
+  maxReplicas: 1
+  metrics:
+  - resource:
+      name: "cpu"
+      target:
+        averageUtilization: 50
+        type: "Utilization"
+    type: "Resource"
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: "apps/v1"
+    kind: "Deployment"
+    name: "crm-deployment"
+---
+apiVersion: v1
+kind: "ConfigMap"
+metadata:
+  name: "crm-configmap"
+data:
+  Config.toml: |
+{{ .Files.Get "files/crm-config.toml" | indent 4 }}
+

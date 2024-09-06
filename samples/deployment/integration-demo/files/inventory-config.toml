@@ -1,0 +1,13 @@
+shipmentHost="shipments-svc"
+
+[ballerina.observe]
+tracingEnabled=true
+tracingProvider="jaeger"
+
+[ballerinax.jaeger]
+agentHostname="data-prepper.observability.svc.cluster.local"
+agentPort=4317
+samplerType="const"
+samplerParam=1.0
+reporterFlushInterval=2000
+reporterBufferSize=1000

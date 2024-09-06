@@ -1,0 +1,345 @@
+{
+	"info": {
+		"_postman_id": "f37973e9-4de0-4696-a697-50bf88e2a44a",
+		"name": "Integration_Observability",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "2476466"
+	},
+	"item": [
+		{
+			"name": "Apps",
+			"item": [
+				{
+					"name": "Ballerina - Place order",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"orderId\": \"P1\",\n    \"customerId\": \"Ben\",\n    \"productId\": \"P100\",\n    \"quantity\": 2\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9100/tmart/orders",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9100",
+							"path": [
+								"tmart",
+								"orders"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Ballerina - Place order Inventory Error",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"orderId\": \"P1\",\n    \"customerId\": \"Ben\",\n    \"productId\": \"P101\",\n    \"quantity\": 2\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9100/tmart/orders",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9100",
+							"path": [
+								"tmart",
+								"orders"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Ballerina - Place order Shipment Error",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"orderId\": \"PE\",\n    \"customerId\": \"Ben\",\n    \"productId\": \"P100\",\n    \"quantity\": 2\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9100/tmart/orders",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9100",
+							"path": [
+								"tmart",
+								"orders"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Ballerina - Place order CRM Error Copy",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"orderId\": \"P1\",\n    \"customerId\": \"John\",\n    \"productId\": \"P100\",\n    \"quantity\": 2\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9100/tmart/orders",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9100",
+							"path": [
+								"tmart",
+								"orders"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "MI-Inspection",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"section\": \"s1\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8290/qa/inspections",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8290",
+							"path": [
+								"qa",
+								"inspections"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "MI-Inspection Error",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"section\": \"s2\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8290/qa/inspections",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8290",
+							"path": [
+								"qa",
+								"inspections"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "MI-binventory",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"item\": \"t10\",\n    \"quantity\": 12\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8290/binventory/allocations",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8290",
+							"path": [
+								"binventory",
+								"allocations"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "MI-bookstore",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"order\": \"P1\",\n    \"customer\": \"Ben\",\n    \"bookId\": \"B10\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8290/store/orders",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8290",
+							"path": [
+								"store",
+								"orders"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "MI-bookstore Error",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"order\": \"PE\",\n    \"customer\": \"Ben\",\n    \"bookId\": \"B10\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8290/store/orders",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8290",
+							"path": [
+								"store",
+								"orders"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Debug - Customers",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"orderId\": \"AO100\",\n    \"customerId\": \"Bob\",\n    \"productId\": \"P100\",\n    \"quantity\": 1200\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9102/customers/customers/Bob/address",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9102",
+							"path": [
+								"customers",
+								"customers",
+								"Bob",
+								"address"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Debug - Inventory",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"itemId\": \"P200\",\n    \"quantity\": 2\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9103/inventory/allocations",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9103",
+							"path": [
+								"inventory",
+								"allocations"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

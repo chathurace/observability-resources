@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<api context="/store" name="bookstore" xmlns="http://ws.apache.org/ns/synapse">
+    <resource methods="POST" uri-template="/orders">
+        <inSequence>
+            <log category="INFO" level="custom">
+                <property name="Status" value="Order received" />
+            </log>
+            <propertyGroup>
+                <property name="orderId" expression="json-eval($.order)" scope="default" type="STRING"/>
+                <property name="customerName" expression="json-eval($.customer)" scope="default" type="STRING"/>
+                <property name="bookId" expression="json-eval($.bookId)" scope="default" type="STRING"/>
+                <property name="address" value="some address" scope="default" type="STRING"/>
+            </propertyGroup>
+
+            <!-- Call to allocate the book -->
+            <payloadFactory media-type="json">
+                <format>{"book":"$1"}</format>
+                <args>
+                    <arg evaluator="xml" expression="get-property('bookId')"/>
+                </args>
+            </payloadFactory>
+            <call>
+				<endpoint>
+					<http method="POST"
+						uri-template="http://bookpark-svc:8290/binventory/allocations" />
+				</endpoint>
+			</call>
+
+			<!-- Call to initiate shipment -->
+            <payloadFactory media-type="json">
+                <format>{"orderId":"$1",
+					"address":"$2"}</format>
+                <args>
+                    <arg evaluator="xml" expression="get-property('orderId')"/>
+                    <arg evaluator="xml" expression="get-property('address')"/>
+				</args>
+			</payloadFactory>
+            <call>
+                <endpoint>
+                    <http method="POST" uri-template="http://shipments-svc:9101/logistics/shipments"/>
+				</endpoint>
+			</call>
+
+			<!-- Construct success response -->
+            <payloadFactory media-type="json">
+                <format>{"order":"$1",
+					"status":"order successful"}</format>
+                <args>
+                    <arg evaluator="xml" expression="get-property('orderId')"/>
+				</args>
+			</payloadFactory>
+            <respond/>
+        </inSequence>
+        
+        <faultSequence>
+            <property name="HTTP_SC" value="500" scope="axis2"/>
+            <log category="ERROR" level="custom">
+                <property name="Status" value="Failed to place order" />
+            </log>
+            <payloadFactory media-type="json">
+                <format>{"order":"$1",
+					"status":"failed"}</format>
+                <args>
+                    <arg evaluator="xml" expression="get-property('orderId')"/>
+				</args>
+			</payloadFactory>
+            <respond/>
+        </faultSequence>
+    </resource>
+</api>

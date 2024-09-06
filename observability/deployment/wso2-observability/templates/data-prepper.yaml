@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: data-prepper
+  namespace: observability
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: data-prepper
+  template:
+    metadata:
+      labels:
+        app: data-prepper
+    spec:
+      containers:
+      - name: data-prepper
+        image: opensearchproject/data-prepper:latest
+        ports:
+        - containerPort: 8021
+        - containerPort: 4317
+        volumeMounts:
+        - name: data-prepper-configmap-volume
+          mountPath: /usr/share/data-prepper/pipelines/
+          readOnly: false
+      volumes:
+      - name: data-prepper-configmap-volume
+        configMap:
+          name: data-prepper-configmap
+---
+apiVersion: v1
+kind: "ConfigMap"
+metadata:
+  name: "data-prepper-configmap"
+  namespace: "observability"
+data:
+  pipelines.yaml: |
+{{ tpl (.Files.Get "files/pipelines.yaml") . | indent 4 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: data-prepper
+  namespace: observability
+  labels:
+    app: data-prepper
+spec:
+  selector:
+    app: data-prepper
+  ports:
+  - name: dpadmin
+    port: 8021
+    targetPort: 8021
+  - name: dpotlp
+    port: 4317
+    targetPort: 4317
+  type: ClusterIP

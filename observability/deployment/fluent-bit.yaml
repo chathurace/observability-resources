@@ -1,0 +1,106 @@
+config:
+    customParsers: |
+        [PARSER]
+            Name   bal_parser
+            Format regex
+            Regex  ^time=(?<time>[^ ]+) level=(?<level>[^ ]+) module=(?<module>[^ ]+) message="(?<message>[^"]+)"(?: error="(?<error>[^"]+)")?(?: traceId="(?<traceId>[^"]+)")?(?: spanId="(?<spanId>[^"]+)")?(?<extra_fields>.*)?
+            Time_Key time
+            Time_Format %Y-%m-%dT%H:%M:%S.%L%z
+
+        [PARSER]
+            Name   wso2mi_parser
+            Format regex
+            Regex  ^\[(?<timestamp>[^\]]+)\]\s+(?<level>\S+)\s+\{(?<module>[^\}]+)\}\s+-\s+(\{api:(?<api>[^\}]+)\}\s+)?(?<message>.*)$
+            Time_Key timestamp
+            Time_Format %Y-%m-%d %H:%M:%S,%L
+
+
+    inputs: |
+        [INPUT]
+            Name tail
+            Inotify_Watcher false
+            Path /var/log/containers/*.log
+            Refresh_Interval 5
+            Tag kube.*
+            Mem_Buf_Limit 256MB
+            Skip_Long_Lines On
+            Key keyfromtail
+            multiline.parser docker, cri
+
+    filters: |
+        [FILTER]
+            Name kubernetes
+            Buffer_Size 32MB
+            K8S-Logging.Parser Off
+            K8S-Logging.Exclude Off
+            Match kube.*
+            tls.verify Off
+            Use_Kubelet false
+            Keep_Log On
+            Merge_Log On
+            Labels On
+            Annotations On
+            Merge_Log_Key processed
+
+        [FILTER]
+            Name rewrite_tag
+            Match kube.*
+            Rule $kubernetes['labels']['component'] wso2ballerina wso2_bal_logs false
+            Emitter_Name re_emitted_wso2
+
+        [FILTER]
+            Name parser
+            Match wso2_bal_logs
+            Key_Name log
+            Parser bal_parser
+            Reserve_Data On
+
+        [FILTER]
+            Name modify
+            Match wso2_bal_logs
+            Add product integration
+            Add component ballerina
+
+        [FILTER]
+            Name rewrite_tag
+            Match kube.*
+            Rule $kubernetes['labels']['component'] wso2mi wso2_mi_logs false
+            Emitter_Name re_emitted_mi
+
+        [FILTER]
+            Name parser
+            Match wso2_mi_logs
+            Key_Name log
+            Parser wso2mi_parser
+            Reserve_Data On
+
+        [FILTER]
+            Name modify
+            Match wso2_mi_logs
+            Add product integration
+            Add component mi
+
+    outputs: |
+        [OUTPUT]
+            Name opensearch
+            Host opensearch-data
+            HTTP_Passwd admin
+            HTTP_User admin
+            Logstash_Format On
+            Logstash_DateFormat %Y-%m-%d
+            Logstash_Prefix wso2-integration-logs
+            Match wso2_*
+            Port 9200
+            Replace_Dots On
+            Suppress_Type_Name On
+            tls On
+            tls.verify Off
+            Trace_Error On
+
+        [OUTPUT]
+            Name stdout
+            Match wso2_*
+
+dnsPolicy: ClusterFirstWithHostNet
+
+hostNetwork: true

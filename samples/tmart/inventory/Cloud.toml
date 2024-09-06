@@ -1,0 +1,11 @@
+[container.image]
+repository="tmart"
+name="inventory"
+tag="v1"
+
+[[cloud.config.files]]
+file="Config.toml"
+
+[cloud.deployment.autoscaling]
+min_replicas=1
+max_replicas=1

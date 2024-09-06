@@ -1,0 +1,8 @@
+[container.image]
+repository="tmart"
+name="crm"
+tag="v1"
+
+[cloud.deployment.autoscaling]
+min_replicas=1
+max_replicas=1

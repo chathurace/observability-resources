@@ -1,0 +1,94 @@
+---
+apiVersion: "v1"
+kind: "Service"
+metadata:
+  labels:
+    app: "inventory"
+  name: "inventory-svc"
+spec:
+  ports:
+  - name: "port-1-inventor"
+    port: 9103
+    protocol: "TCP"
+    targetPort: 9103
+  selector:
+    app: "inventory"
+  type: "ClusterIP"
+---
+apiVersion: "v1"
+kind: "ConfigMap"
+metadata:
+  name: "inventory-config-map"
+data:
+  Config.toml: |
+{{ .Files.Get "files/inventory-config.toml" | indent 4 }}
+---
+apiVersion: "apps/v1"
+kind: "Deployment"
+metadata:
+  labels:
+    app: "inventory"
+  name: "inventory-deployment"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "inventory"
+  template:
+    metadata:
+      labels:
+        app: "inventory"
+        component: "wso2ballerina"
+    spec:
+      containers:
+      - env:
+        - name: "BAL_CONFIG_FILES"
+          value: "/home/ballerina/conf/Config.toml:"
+        image: "tmart/inventory:v1"
+        lifecycle:
+          preStop:
+            exec:
+              command:
+              - "sleep"
+              - "15"
+        name: "inventory-deployment"
+        ports:
+        - containerPort: 9103
+          name: "port-1-inventor"
+          protocol: "TCP"
+        resources:
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+          requests:
+            memory: "100Mi"
+            cpu: "200m"
+        volumeMounts:
+        - mountPath: "/home/ballerina/conf/"
+          name: "inventory-config-map-volume"
+          readOnly: false
+      volumes:
+      - configMap:
+          name: "inventory-config-map"
+        name: "inventory-config-map-volume"
+---
+apiVersion: "autoscaling/v2"
+kind: "HorizontalPodAutoscaler"
+metadata:
+  labels:
+    app: "inventory"
+  name: "inventory-hpa"
+spec:
+  maxReplicas: 1
+  metrics:
+  - resource:
+      name: "cpu"
+      target:
+        averageUtilization: 50
+        type: "Utilization"
+    type: "Resource"
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: "apps/v1"
+    kind: "Deployment"
+    name: "inventory-deployment"

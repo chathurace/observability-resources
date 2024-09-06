@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<api context="/qa" name="quality" xmlns="http://ws.apache.org/ns/synapse">
+    <resource methods="POST" uri-template="/inspections">
+        <inSequence>
+			<property name="payload" expression="json-eval($)" scope="default" type="STRING" />
+            <filter source="json-eval($.section)" regex="s2">
+                <then>
+					<log category="ERROR" level="custom">
+						<property name="Status" value="Section s2 is not allowed" />
+					</log>
+					<property name="HTTP_SC" value="500" scope="axis2" />
+                    <payloadFactory media-type="json">
+                        <format>{"error":"Section
+							s2 is not allowed"}</format>
+						<args />
+					</payloadFactory>
+				</then>
+                <else>
+					<!-- Continue with other processing if needed -->
+					<log category="INFO" level="simple">
+						<property name="Status" value="Inspection created" />
+					</log>
+					<payloadFactory media-type="json" template-type="default">
+						<format>{"Status":"Inspection
+							created"}</format>
+						<args>
+						</args>
+					</payloadFactory>
+					<!-- Continue with other processing if needed -->
+				</else>
+			</filter>
+			<respond />
+		</inSequence>
+        <faultSequence>
+		</faultSequence>
+    </resource>
+</api>
