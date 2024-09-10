@@ -1,7 +1,7 @@
 {
 	"info": {
 		"_postman_id": "f37973e9-4de0-4696-a697-50bf88e2a44a",
-		"name": "Integration_Observability",
+		"name": "WSO2_Observability",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "2476466"
 	},
@@ -33,6 +33,35 @@
 							"path": [
 								"tmart",
 								"orders"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Bal_MI - Place book order",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"orderId\": \"P1\",\n    \"customerId\": \"Ben\",\n    \"productId\": \"P100\",\n    \"quantity\": 2\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9100/tmart/bookOrders",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9100",
+							"path": [
+								"tmart",
+								"bookOrders"
 							]
 						}
 					},
@@ -97,13 +126,13 @@
 					"response": []
 				},
 				{
-					"name": "Ballerina - Place order CRM Error Copy",
+					"name": "Ballerina - Place order CRM Error",
 					"request": {
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"orderId\": \"P1\",\n    \"customerId\": \"John\",\n    \"productId\": \"P100\",\n    \"quantity\": 2\n}",
+							"raw": "{\n    \"orderId\": \"P1\",\n    \"customerId\": \"Bob\",\n    \"productId\": \"P100\",\n    \"quantity\": 2\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -269,7 +298,12 @@
 						}
 					},
 					"response": []
-				},
+				}
+			]
+		},
+		{
+			"name": "Debug",
+			"item": [
 				{
 					"name": "Debug - Customers",
 					"protocolProfileBehavior": {
@@ -288,7 +322,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:9102/customers/customers/Bob/address",
+							"raw": "http://localhost:9102/customers/customers",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -296,9 +330,39 @@
 							"port": "9102",
 							"path": [
 								"customers",
+								"customers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Debug - Customers Regions",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"orderId\": \"AO100\",\n    \"customerId\": \"Bob\",\n    \"productId\": \"P100\",\n    \"quantity\": 1200\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9102/customers/regions",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9102",
+							"path": [
 								"customers",
-								"Bob",
-								"address"
+								"regions"
 							]
 						}
 					},
@@ -334,6 +398,41 @@
 							"path": [
 								"inventory",
 								"allocations"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Debug - Shipments",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"itemId\": \"P200\",\n    \"quantity\": 2\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9101/logistics/shipments",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9101",
+							"path": [
+								"logistics",
+								"shipments"
 							]
 						}
 					},

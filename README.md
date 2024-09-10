@@ -51,7 +51,7 @@ kubectl port-forward svc/bookpark-svc 8290:8290
 kubectl port-forward svc/portal-svc 9100:9100
 ```
 
-3. Import `<local_folder>/observability-resources/samples/postman/Integration_Observability.postman_collection.json` to Postman. This contains various requests that cause deployed MI and Ballerina pods to emit different log messages.
+3. Import `<local_folder>/observability-resources/samples/postman/WSO2_Observability.postman_collection.json` to Postman. This contains various requests that cause deployed MI and Ballerina pods to emit different log messages.
 
 4. In the OpenSearch dashboard, Navigate to `Dashboards -> Integration logs dashboard` to view log analytics of MI and Ballerina deployments.
 
