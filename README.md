@@ -61,6 +61,6 @@ The architecture of the observability solution is shown below.
 
 ![Architecture](images/observability_architecture.png)
 
-Fluent Bit pods are deployed as a Kubernetes deamon set. Therefore, One Fluent Bit pod will be deployed in each VM in the Kubernetes cluster. These Fluent Bit pods capture logs emitted by all pods in their corresponding VMs and send those to OpenSearch data pods. Before sending logs, Fluent Bit pods perform some preprocessing operations such as extracting required fields, adding metadata fields, and renaming fields.
+Fluent Bit pods are deployed as a Kubernetes DaemonSet. Therefore, One Fluent Bit pod will be deployed in each VM in the Kubernetes cluster. These Fluent Bit pods capture logs emitted by all pods in their corresponding VMs and send those to OpenSearch data pods. Before sending logs, Fluent Bit pods perform some preprocessing operations such as extracting required fields, adding metadata fields, and renaming fields.
 
 OpenSearch data pods handle all data processing operations such indexing, searching, and aggregrations. OpenSearch master pods peform cluster coordination operations such as index/shard allocations and maintaining cluster's health. OpenSearch dashboards pods act as the backend for the observability dashboard. All log visualizations and dashboards are deployed into dashboard pods. 
