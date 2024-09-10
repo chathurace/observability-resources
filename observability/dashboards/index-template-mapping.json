@@ -33,6 +33,9 @@
       },
       "component": {
         "type": "keyword"
+      },
+      "app": {
+        "type": "keyword"
       }
     }
   }

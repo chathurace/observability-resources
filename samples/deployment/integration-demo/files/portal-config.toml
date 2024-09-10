@@ -1,6 +1,7 @@
 shipmentHost="shipments-svc"
 crmHost="crm-svc"
 inventoryHost="inventory-svc"
+bookParkHost="bookpark-svc"
 
 [ballerina.observe]
 tracingEnabled=true

@@ -25,7 +25,7 @@ service /inventory on new http:Listener(9103) {
         return inventoryMap.keys();
     }
 
-    resource function post allocations(Allocation allocation) returns string|error {
+    resource function post allocations(Allocation allocation) returns json|error {
         log:printInfo(string `Allocating items: ${allocation.itemId} - ${allocation.quantity}`);
         int? availableQuantity = inventoryMap[allocation.itemId];
         if (availableQuantity == ()) {
@@ -35,12 +35,12 @@ service /inventory on new http:Listener(9103) {
             log:printInfo("Insufficient quantity in the inventory. Creating a warehouse order for item: " + allocation.itemId);
             do {
                 http:Client shipments = check new("http://" + shipmentHost + ":9101/logistics");
-                string message = check shipments->/shipments.post({orderId: allocation.orderId, address: "WH1"});
+                json message = check shipments->/shipments.post({orderId: allocation.orderId, address: "WH1"});
             } on fail error e {
                 log:printError("Error while creating a warehouse order for " + allocation.itemId, e);
                 return error("Error while creating a warehouse order for " + allocation.itemId);
             }
         }
-        return "Allocated successfully";
+        return {orderId: allocation.orderId, status: "Allocated successfully"};
     }
 }

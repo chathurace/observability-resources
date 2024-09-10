@@ -1,0 +1,6 @@
+{
+    "attributes": {
+      "title": "wso2-integration-logs-*",
+      "timeFieldName": "time"
+    }
+  }

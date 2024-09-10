@@ -17,12 +17,12 @@ service /logistics on new http:Listener(9101) {
         return ["Shipment 1", "Shipment 2", "Shipment 3"];
     }
 
-    resource function post shipments(Shipment shipmentData) returns string|error {
+    resource function post shipments(Shipment shipmentData) returns json|error {
         log:printInfo("Creating shipment for order: " + shipmentData.orderId);
         if shipmentData.orderId == "PE" {
             log:printError("Error creating shipment for order: " + shipmentData.orderId);
             return error("Error creating shipment for order: " + shipmentData.orderId);
         }
-        return "Created shipment with data: " + shipmentData.orderId;
+        return {orderId: shipmentData.orderId, status: "Created shipment for address: " + shipmentData.address};
     }
 }

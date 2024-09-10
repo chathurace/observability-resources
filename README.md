@@ -1,60 +1,49 @@
-# WSO2 Integration Observability Solution
+# WSO2 Observability Solution
 
-## Pre-requisites
-- Kubernetes cluster
-- Helm
+WSO2 observability solution provides monitoring and analytics capabilities for WSO2 products based on open source products and standards such as OpenSearch, Fluent-Bit, and Open Telemetry.
 
-## Deployment
+## Installation
 
-1. Clone this repository to a local folder. Local repository path is shown as `<repo-path>` in remaining sections.
+### Pre-requisites
 
-2. Create a Kubernetes namespace named "observability"
+This version of the observability solution focuses on Kubernetes-based environments, where WSO2 products and the observability solution are deployed on Kubernetes. Therefore, a Kubernetes cluster and the Helm package management system is requried for installing and working with this solution.
+
+- **Kubernetes:**
+ For trying out the solution, it is possible to setup a Kubernetes cluster locally using the [Rancher Desktop](https://docs.rancherdesktop.io/getting-started/installation) or the [Docker Desktop](https://www.docker.com/get-started/). Alternatively, any on-premise or cloud-based Kubernetes cluster such as [Azure Kubernetes Service (AKS)](https://azure.microsoft.com/en-us/products/kubernetes-service) or [Amazon Elastic Kuberntes Service (EKS)](https://aws.amazon.com/eks/) can be used.
+
+- **Helm:**
+Rancher Desktop has Helm built-in. If not, install [Helm](https://helm.sh/docs/intro/install/)
+
+The following pre-requisites are required only for trying out samples.
+
+- **Ballerina:** Install the [Ballerina programming laguage](https://ballerina.io/downloads/).
+
+- **Maven:** [Download](https://maven.apache.org/download.cgi) and [install](https://maven.apache.org/install.html) the Maven build system.
+
+- **Postman:** Download and install the [Postman](https://www.postman.com/downloads/) client for invoking sample APIs. 
+
+### Deploying the observability solution
+
+Once the pre-requisites are setup, the observability solution can be deployed by executing the provided installation script.
+
+1. Clone this repository to a local folder.
+
+2. Naviagte to the `<local_folder>/observability-resources/observability/` folder and execute the installation script using the following command.
 ```
-kubectl create ns observability
+sh deploy-observability.sh
 ```
+3. Access the observability dashboard 
+    - Log in to the OpenSearch dashboard at URL [http://localhost:5601](http://localhost:5601) using the default credentials *(username: admin, password: admin)* 
+    - Navigate to *Dashbaords* menu and click on the *Integration logs dashbaord* to view the logging dashboard.
 
-3. Deploy the OpenSearch operator using the following commands:
-```
-helm repo add opensearch-operator https://opensearch-project.github.io/opensearch-k8s-operator/
-helm repo update
-helm install opensearch-operator opensearch-operator/opensearch-operator -n observability --version 2.6.1
-```
+## Trying out samples
 
-4. Deploy the OpenSearch cluster using the below command: 
-```
-kubectl apply -f <repo-path>/observability/deployment/opensearch.yaml
-``` 
-It will take few minutes to deploy all components of the cluster. Deployment staus can be monitored using the `kubectl get pods -n observability` command. All opensearch pods except the *opensearch-securityconfig* will be in *Ready* state once the deployment is complete.
+A set of sample Ballerina and Micro Integrator deployments are included to try out this solution. Depending on the request payload, these samples generate logs with different log levels, which can be visualized in observability dashboards.
 
-5. Configure a port forwarding to the Open Search dashboard.
+1. Navigate to the `<local_folder>/observability-resources/samples` folder and execute the following command to build and deploy all samples:
 ```
-kubectl port-forward svc/opensearch-dashboards 5601:5601 -n observability
+sh deploy_samples.sh
 ```
-
-6. Deploy the fluent-bit agent using the following commands:
-```
-helm repo add fluent https://fluent.github.io/helm-charts
-helm repo update
-helm install fluent-bit fluent/fluent-bit --version 0.43.0 -n observability -f <repo-path>/observability/deployment/fluent-bit.yaml
-```
-
-7. Deploy Data Prepper by running the following command from the `<repo-path>/observability/deployment/` directory:
-```
-helm install wso2-observability wso2-observability
-```
-
-7. Follow the following steps to deploy integration dashboards:
-    1. Log in to the OpenSearch dashboard at URL [http://localhost:5601](http://localhost:5601) using the default credentials *(username: admin, password: admin)*
-    2. Navigate to *Dashboard management -> Saved objects* menu
-    3. Click *Import* link and import the `<repo-path>/observability/dashboards/integration-dashboards.ndjson` file.
-    4. Navigate to *Dashbaords* menu and you will see two dashbaords for WSO2 Micro Integrator and Ballerina.
-    5. Navigate to the *Traces* menu under the *Observability* section to see trace analytics.
-
-## Trying out the solution
-
-A set of sample Ballerina and Micro Integrator deployments are included to try out this solution. These samples generate logs with different log levels depending on the request payload.
-
-1. Navigate to the `<repo-path>/samples` folder and execute `sh deploy_samples.sh`. This will build and deploy all samples in the Kubernetes cluster.
 
 2. Port forward 8290 and 9100, which are used by MI and Ballerina deployments.
 ```
@@ -62,10 +51,16 @@ kubectl port-forward svc/bookpark-svc 8290:8290
 kubectl port-forward svc/portal-svc 9100:9100
 ```
 
-3. Import `<repo-path>/samples/postman/Integration_Observability.postman_collection.json` to Postman. This contains various requests that cause deployed MI and Ballerina pods to emit different log messages.
+3. Import `<local_folder>/observability-resources/samples/postman/Integration_Observability.postman_collection.json` to Postman. This contains various requests that cause deployed MI and Ballerina pods to emit different log messages.
 
-4. Navigate to `Dashboards -> Ballerina - Dashboard` in the OpenSearch portal to view log analytics of Ballerina pods.
+4. In the OpenSearch dashboard, Navigate to `Dashboards -> Integration logs dashboard` to view log analytics of MI and Ballerina deployments.
 
-5. Navigate to `Dashboards -> MI - Dashboard` in the OpenSearch portal to view log analytics of MI pods.
+## Architecture
 
-6. Navigate to the `Traces` menu under the `Observability` section to see traces and service maps derived from traces.
+The architecture of the observability solution is shown below.
+
+![Architecture](images/observability_architecture.png)
+
+Fluent Bit pods are deployed as a Kubernetes deamon set. Therefore, One Fluent Bit pod will be deployed in each VM in the Kubernetes cluster. These Fluent Bit pods capture logs emitted by all pods in their corresponding VMs and send those to OpenSearch data pods. Before sending logs, Fluent Bit pods perform some preprocessing operations such as extracting required fields, adding metadata fields, and renaming fields.
+
+OpenSearch data pods handle all data processing operations such indexing, searching, and aggregrations. OpenSearch master pods peform cluster coordination operations such as index/shard allocations and maintaining cluster's health. OpenSearch dashboards pods act as the backend for the observability dashboard. All log visualizations and dashboards are deployed into dashboard pods. 

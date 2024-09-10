@@ -1,3 +1,12 @@
+luaScripts:
+    copy_app_name.lua: |
+        function copy_app_name(tag, timestamp, record)
+            if record["kubernetes"] and record["kubernetes"]["labels"] and record["kubernetes"]["labels"]["app"] then
+                record["app"] = record["kubernetes"]["labels"]["app"]
+            end
+            return 1, timestamp, record
+        end
+
 config:
     customParsers: |
         [PARSER]
@@ -79,6 +88,12 @@ config:
             Match wso2_mi_logs
             Add product integration
             Add component mi
+
+        [FILTER]
+            Name lua
+            Match wso2_*
+            script /fluent-bit/scripts/copy_app_name.lua
+            call copy_app_name
 
     outputs: |
         [OUTPUT]
