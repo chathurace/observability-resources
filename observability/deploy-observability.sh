@@ -53,7 +53,7 @@ function check_pod_status() {
 
 # Loop until all conditions are met
 until check_pod_status; do
-  echo "Waiting for OpenSearch cluster to be fully ready. This may take few minutes..."
+  echo "Waiting for OpenSearch cluster to be ready. This may take few minutes..."
   sleep 30
 done
 
