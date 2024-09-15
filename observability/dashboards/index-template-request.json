@@ -39,6 +39,9 @@
                 "component": {
                     "type": "keyword"
                 },
+                "package": {
+                    "type": "keyword"
+                },
                 "app": {
                     "type": "keyword"
                 }

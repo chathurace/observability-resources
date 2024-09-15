@@ -17,12 +17,11 @@ config:
             Time_Format %Y-%m-%dT%H:%M:%S.%L%z
 
         [PARSER]
-            Name   wso2mi_parser
+            Name   wso2mi_carbon_parser
             Format regex
-            Regex  ^\[(?<timestamp>[^\]]+)\]\s+(?<level>\S+)\s+\{(?<module>[^\}]+)\}\s+-\s+(\{api:(?<api>[^\}]+)\}\s+)?(?<message>.*)$
-            Time_Key timestamp
+            Regex  ^(?<log_type>[A-Z]+) \[(?<time>[0-9-]{10} [0-9:,]{12})\]\s+(?<level>[A-Z]+)\s+\{(?<module>[^}]+)\}\s*(?:\[\s*Deployed From Artifact Container:\s+(?<package>[^\]]+)\s*\]\s*)?\s*(?:-\s+\{api:(?<api>[^}]+)\})?\s*(?<message>.+)
+            Time_Key   time
             Time_Format %Y-%m-%d %H:%M:%S,%L
-
 
     inputs: |
         [INPUT]
@@ -77,17 +76,71 @@ config:
             Emitter_Name re_emitted_mi
 
         [FILTER]
-            Name parser
-            Match wso2_mi_logs
-            Key_Name log
-            Parser wso2mi_parser
-            Reserve_Data On
-
-        [FILTER]
             Name modify
             Match wso2_mi_logs
             Add product integration
             Add component mi
+
+        [FILTER]
+            Name rewrite_tag
+            Match wso2_mi_logs
+            Rule $log ^CARBON wso2_mi_carbon_logs false
+            Emitter_Name re_emitted_mi_carbon
+
+        [FILTER]
+            Name parser
+            Match wso2_mi_carbon_logs
+            Key_Name log
+            Parser wso2mi_carbon_parser
+            Reserve_Data On
+
+        [FILTER]
+            Name rewrite_tag
+            Match wso2_mi_logs
+            Rule $log ^HTTP wso2_mi_http_logs false
+            Emitter_Name re_emitted_mi_http
+
+        [FILTER]
+            Name rewrite_tag
+            Match wso2_mi_logs
+            Rule $log ^API wso2_mi_api_logs false
+            Emitter_Name re_emitted_mi_api
+
+        [FILTER]
+            Name rewrite_tag
+            Match wso2_mi_logs
+            Rule $log ^ERR wso2_mi_error_logs false
+            Emitter_Name re_emitted_mi_error
+
+        [FILTER]
+            Name rewrite_tag
+            Match wso2_mi_logs
+            Rule $log ^AUDIT wso2_mi_audit_logs false
+            Emitter_Name re_emitted_mi_audit
+
+        [FILTER]
+            Name rewrite_tag
+            Match wso2_mi_logs
+            Rule $log ^ATOM wso2_mi_atom_logs false
+            Emitter_Name re_emitted_mi_atom
+
+        [FILTER]
+            Name rewrite_tag
+            Match wso2_mi_logs
+            Rule $log ^CREL wso2_mi_correlation_logs false
+            Emitter_Name re_emitted_mi_correlation
+
+        [FILTER]
+            Name rewrite_tag
+            Match wso2_mi_logs
+            Rule $log ^SERV wso2_mi_service_logs false
+            Emitter_Name re_emitted_mi_service
+
+        [FILTER]
+            Name rewrite_tag
+            Match wso2_mi_logs
+            Rule $log ^TRACE wso2_mi_trace_logs false
+            Emitter_Name re_emitted_mi_trace
 
         [FILTER]
             Name lua
@@ -104,7 +157,119 @@ config:
             Logstash_Format On
             Logstash_DateFormat %Y-%m-%d
             Logstash_Prefix wso2-integration-logs
-            Match wso2_*
+            Match_regex ^wso2_(mi_carbon_logs|bal_logs)$
+            Port 9200
+            Replace_Dots On
+            Suppress_Type_Name On
+            tls On
+            tls.verify Off
+            Trace_Error On
+
+        [OUTPUT]
+            Name opensearch
+            Host opensearch-data
+            HTTP_Passwd admin
+            HTTP_User admin
+            Logstash_Format On
+            Logstash_DateFormat %Y-%m-%d
+            Logstash_Prefix wso2-mi-http-logs
+            Match wso2_mi_http_logs
+            Port 9200
+            Replace_Dots On
+            Suppress_Type_Name On
+            tls On
+            tls.verify Off
+            Trace_Error On
+
+        [OUTPUT]
+            Name opensearch
+            Host opensearch-data
+            HTTP_Passwd admin
+            HTTP_User admin
+            Logstash_Format On
+            Logstash_DateFormat %Y-%m-%d
+            Logstash_Prefix wso2-mi-api-logs
+            Match wso2_mi_api_logs
+            Port 9200
+            Replace_Dots On
+            Suppress_Type_Name On
+            tls On
+            tls.verify Off
+            Trace_Error On
+
+        [OUTPUT]
+            Name opensearch
+            Host opensearch-data
+            HTTP_Passwd admin
+            HTTP_User admin
+            Logstash_Format On
+            Logstash_DateFormat %Y-%m-%d
+            Logstash_Prefix wso2-mi-error-logs
+            Match wso2_mi_error_logs
+            Port 9200
+            Replace_Dots On
+            Suppress_Type_Name On
+            tls On
+            tls.verify Off
+            Trace_Error On
+
+        [OUTPUT]
+            Name opensearch
+            Host opensearch-data
+            HTTP_Passwd admin
+            HTTP_User admin
+            Logstash_Format On
+            Logstash_DateFormat %Y-%m-%d
+            Logstash_Prefix wso2-mi-atom-logs
+            Match wso2_mi_atom_logs
+            Port 9200
+            Replace_Dots On
+            Suppress_Type_Name On
+            tls On
+            tls.verify Off
+            Trace_Error On
+
+        [OUTPUT]
+            Name opensearch
+            Host opensearch-data
+            HTTP_Passwd admin
+            HTTP_User admin
+            Logstash_Format On
+            Logstash_DateFormat %Y-%m-%d
+            Logstash_Prefix wso2-mi-correlation-logs
+            Match wso2_mi_correlation_logs
+            Port 9200
+            Replace_Dots On
+            Suppress_Type_Name On
+            tls On
+            tls.verify Off
+            Trace_Error On
+
+        [OUTPUT]
+            Name opensearch
+            Host opensearch-data
+            HTTP_Passwd admin
+            HTTP_User admin
+            Logstash_Format On
+            Logstash_DateFormat %Y-%m-%d
+            Logstash_Prefix wso2-mi-service-logs
+            Match wso2_mi_service_logs
+            Port 9200
+            Replace_Dots On
+            Suppress_Type_Name On
+            tls On
+            tls.verify Off
+            Trace_Error On
+
+        [OUTPUT]
+            Name opensearch
+            Host opensearch-data
+            HTTP_Passwd admin
+            HTTP_User admin
+            Logstash_Format On
+            Logstash_DateFormat %Y-%m-%d
+            Logstash_Prefix wso2-mi-trace-logs
+            Match wso2_mi_trace_logs
             Port 9200
             Replace_Dots On
             Suppress_Type_Name On
