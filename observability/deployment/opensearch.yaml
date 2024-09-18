@@ -13,7 +13,7 @@ spec:
         version: 2.11.1
         replicas: 1
         additionalConfig:
-            opensearchDashboards.branding.logo.defaultUrl: "https://raw.githubusercontent.com/chathurace/observability-resources/main/images/wso2-inverted-logo.png"
+            opensearchDashboards.branding.logo.defaultUrl: "https://raw.githubusercontent.com/chathurace/observability-resources/main/images/logo_wso2.png"
             opensearchDashboards.branding.mark.defaultUrl: "https://raw.githubusercontent.com/chathurace/observability-resources/main/images/mark_wso2.png"
             opensearchDashboards.branding.applicationTitle: "WSO2 Observability Dashboard" 
     nodePools:

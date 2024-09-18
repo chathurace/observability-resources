@@ -278,8 +278,20 @@ config:
             Trace_Error On
 
         [OUTPUT]
-            Name stdout
-            Match wso2_*
+            Name opensearch
+            Host opensearch-data
+            HTTP_Passwd admin
+            HTTP_User admin
+            Logstash_Format On
+            Logstash_DateFormat %Y-%m-%d
+            Logstash_Prefix general-logs
+            Match ^(?!wso2).*
+            Port 9200
+            Replace_Dots On
+            Suppress_Type_Name On
+            tls On
+            tls.verify Off
+            Trace_Error On
 
 dnsPolicy: ClusterFirstWithHostNet
 
