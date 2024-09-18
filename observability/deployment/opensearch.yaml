@@ -1,47 +1,47 @@
 apiVersion: opensearch.opster.io/v1
 kind: OpenSearchCluster
 metadata:
- name: opensearch
- namespace: observability
+    name: opensearch
+    namespace: observability
 spec:
- general:
-   setVMMaxMapCount: true
-   serviceName: opensearch
-   version: 2.11.1
- dashboards:
-   enable: true
-   version: 2.11.1
-   replicas: 1
- nodePools:
- - component: master
-   replicas: 2
-   diskSize: "3Gi"
-   nodeSelector:
-   resources:
-     requests:
-       memory: "1000Mi"
-       cpu: "100m"
-     limits:
-       memory: "1100Mi"
-       cpu: "250m"
-   roles:
-   - "master"
- - component: data
-   replicas: 1
-   diskSize: "5Gi"
-   nodeSelector:
-   resources:
-     requests:
-       memory: "1000Mi"
-       cpu: "500m"
-     limits:
-       memory: "1100Mi"
-       cpu: "800m"
-   roles:
-   - "data"
- security:
-   tls:
-     transport:
-       generate: true
-     http:
-       generate: true
+    general:
+        setVMMaxMapCount: true
+        serviceName: opensearch
+        version: 2.11.1
+    dashboards:
+        enable: true
+        version: 2.11.1
+        replicas: 1
+        additionalConfig:
+            opensearchDashboards.branding.logo.defaultUrl: "https://raw.githubusercontent.com/chathurace/observability-resources/main/images/wso2-inverted-logo.png"
+    nodePools:
+        - component: master
+          replicas: 2
+          diskSize: "3Gi"
+          resources:
+              requests:
+                  memory: "1000Mi"
+                  cpu: "100m"
+              limits:
+                  memory: "1100Mi"
+                  cpu: "250m"
+          roles:
+              - "master"
+        - component: data
+          replicas: 1
+          diskSize: "5Gi"
+          resources:
+              requests:
+                  memory: "1000Mi"
+                  cpu: "500m"
+              limits:
+                  memory: "1100Mi"
+                  cpu: "800m"
+          roles:
+              - "data"
+    security:
+        tls:
+            transport:
+                generate: true
+            http:
+                generate: true
