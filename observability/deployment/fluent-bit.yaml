@@ -285,7 +285,7 @@ config:
             Logstash_Format On
             Logstash_DateFormat %Y-%m-%d
             Logstash_Prefix general-logs
-            Match ^(?!wso2).*
+            Match kube.*
             Port 9200
             Replace_Dots On
             Suppress_Type_Name On
