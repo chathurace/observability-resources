@@ -14,7 +14,7 @@ spec:
         replicas: 1
         additionalConfig:
             opensearchDashboards.branding.logo.defaultUrl: "https://raw.githubusercontent.com/chathurace/observability-resources/main/images/wso2-inverted-logo.png"
-            opensearchDashboards.branding.mark.defaultUrl: "https://wso2.cachefly.net/wso2/sites/images/brand/downloads/wso2-logo.svg"
+            opensearchDashboards.branding.mark.defaultUrl: "https://raw.githubusercontent.com/chathurace/observability-resources/main/images/mark_wso2.png"
             opensearchDashboards.branding.applicationTitle: "WSO2 Observability Dashboard" 
     nodePools:
         - component: master
