@@ -1,0 +1,35 @@
+name: Release observability resources
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag for the release'
+        required: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install GitHub CLI
+        run: sudo apt-get install gh
+
+      - name: Create a zip excluding specific files and folders
+        run: |
+          zip -r wso2-observability-resources-${{ github.event.inputs.tag }}.zip . \
+          -x "./.github/*" \
+          -x "./issue_template.md" \
+          -x "./.gitignore" \
+          -x "./pull_request_template.md"
+
+      - name: Authenticate GitHub CLI
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
+
+      - name: Create GitHub Release
+        run: gh release create ${{ github.event.inputs.tag }} wso2-observability-resources-${{ github.event.inputs.tag }}.zip --title "Release ${{ github.event.inputs.tag }}" --generate-notes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
