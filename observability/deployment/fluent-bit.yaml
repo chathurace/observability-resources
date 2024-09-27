@@ -23,6 +23,13 @@ config:
             Time_Key   time
             Time_Format %Y-%m-%d %H:%M:%S,%L
 
+        [PARSER]
+            Name   wso2apim_carbon_parser
+            Format regex
+            Regex  ^(?<log_type>[A-Z]+) \[(?<time>[0-9-]{10} [0-9:,]{12})\]\s+(?<level>[A-Z]+)\s+\{(?<module>[^}]+)\}\s*(?:\[\s*Deployed From Artifact Container:\s+(?<package>[^\]]+)\s*\]\s*)?\s*(?:-\s+\{api:(?<api>[^}]+)\})?\s*(?<message>.+)
+            Time_Key   time
+            Time_Format %Y-%m-%d %H:%M:%S,%L
+
     inputs: |
         [INPUT]
             Name tail
@@ -97,6 +104,32 @@ config:
             Preserve_Key True
 
         [FILTER]
+            Name rewrite_tag_apim
+            Match kube.*
+            Rule $kubernetes['labels']['component'] wso2apim wso2_apim_logs false
+            Emitter_Name re_emitted_apim
+
+        [FILTER]
+            Name modify_apim
+            Match wso2_apim_logs
+            Add product api-management
+            Add component apim
+
+        [FILTER]
+            Name rewrite_tag_apim
+            Match wso2_apim_logs
+            Rule $log ^CARBON wso2_apim_carbon_logs false
+            Emitter_Name re_emitted_apim_carbon
+
+        [FILTER]
+            Name parser
+            Match wso2_apim_carbon_logs
+            Key_Name log
+            Parser wso2apim_carbon_parser
+            Reserve_Data True
+            Preserve_Key True
+
+        [FILTER]
             Name rewrite_tag
             Match wso2_mi_logs
             Rule $log ^HTTP wso2_mi_http_logs false
@@ -119,6 +152,30 @@ config:
             Match wso2_mi_logs
             Rule $log ^TRACE wso2_mi_trace_logs false
             Emitter_Name re_emitted_mi_trace
+
+        [FILTER]
+            Name rewrite_tag_apim
+            Match wso2_apim_logs
+            Rule $log ^HTTP wso2_apim_http_logs false
+            Emitter_Name re_emitted_apim_http
+
+        [FILTER]
+            Name rewrite_tag_apim
+            Match wso2_apim_logs
+            Rule $log ^AUDIT wso2_apim_audit_logs false
+            Emitter_Name re_emitted_apim_audit
+
+        [FILTER]
+            Name rewrite_tag_apim
+            Match wso2_apim_logs
+            Rule $log ^CREL wso2_apim_correlation_logs false
+            Emitter_Name re_emitted_apim_correlation
+
+        [FILTER]
+            Name rewrite_tag_apim
+            Match wso2_apim_logs
+            Rule $log ^TRACE wso2_apim_trace_logs false
+            Emitter_Name re_emitted_apim_trace
 
         [FILTER]
             Name lua
@@ -150,8 +207,40 @@ config:
             HTTP_User admin
             Logstash_Format On
             Logstash_DateFormat %Y-%m-%d
+            Logstash_Prefix wso2-apim-application-logs
+            Match wso2_apim_carbon_logs
+            Port 9200
+            Replace_Dots On
+            Suppress_Type_Name On
+            tls On
+            tls.verify Off
+            Trace_Error On
+
+        [OUTPUT]
+            Name opensearch
+            Host opensearch-data
+            HTTP_Passwd admin
+            HTTP_User admin
+            Logstash_Format On
+            Logstash_DateFormat %Y-%m-%d
             Logstash_Prefix wso2-integration-access-logs
             Match wso2_mi_http_logs
+            Port 9200
+            Replace_Dots On
+            Suppress_Type_Name On
+            tls On
+            tls.verify Off
+            Trace_Error On
+
+        [OUTPUT]
+            Name opensearch
+            Host opensearch-data
+            HTTP_Passwd admin
+            HTTP_User admin
+            Logstash_Format On
+            Logstash_DateFormat %Y-%m-%d
+            Logstash_Prefix wso2-apim-access-logs
+            Match wso2_apim_http_logs
             Port 9200
             Replace_Dots On
             Suppress_Type_Name On
@@ -182,6 +271,22 @@ config:
             HTTP_User admin
             Logstash_Format On
             Logstash_DateFormat %Y-%m-%d
+            Logstash_Prefix wso2-apim-correlation-logs
+            Match wso2_apim_correlation_logs
+            Port 9200
+            Replace_Dots On
+            Suppress_Type_Name On
+            tls On
+            tls.verify Off
+            Trace_Error On
+
+        [OUTPUT]
+            Name opensearch
+            Host opensearch-data
+            HTTP_Passwd admin
+            HTTP_User admin
+            Logstash_Format On
+            Logstash_DateFormat %Y-%m-%d
             Logstash_Prefix wso2-integration-trace-logs
             Match wso2_mi_trace_logs
             Port 9200
@@ -198,8 +303,40 @@ config:
             HTTP_User admin
             Logstash_Format On
             Logstash_DateFormat %Y-%m-%d
+            Logstash_Prefix wso2-apim-trace-logs
+            Match wso2_apim_trace_logs
+            Port 9200
+            Replace_Dots On
+            Suppress_Type_Name On
+            tls On
+            tls.verify Off
+            Trace_Error On
+
+        [OUTPUT]
+            Name opensearch
+            Host opensearch-data
+            HTTP_Passwd admin
+            HTTP_User admin
+            Logstash_Format On
+            Logstash_DateFormat %Y-%m-%d
             Logstash_Prefix wso2-integration-audit-logs
             Match wso2_mi_audit_logs
+            Port 9200
+            Replace_Dots On
+            Suppress_Type_Name On
+            tls On
+            tls.verify Off
+            Trace_Error On
+
+        [OUTPUT]
+            Name opensearch
+            Host opensearch-data
+            HTTP_Passwd admin
+            HTTP_User admin
+            Logstash_Format On
+            Logstash_DateFormat %Y-%m-%d
+            Logstash_Prefix wso2-apim-audit-logs
+            Match wso2_apim_audit_logs
             Port 9200
             Replace_Dots On
             Suppress_Type_Name On
